@@ -86,6 +86,26 @@ header{top:34px}
 /* Refuerzo comercial: desarrollo a medida, pagos y preguntas frecuentes */
 .payment-panel{margin:22px 0 0;padding:clamp(22px,4vw,36px);border:1px solid var(--line);border-radius:18px;background:linear-gradient(135deg,rgba(200,255,87,.07),rgba(18,21,24,.72));display:flex;align-items:center;justify-content:space-between;gap:24px}.payment-panel>div{max-width:700px}.payment-panel h3{font-size:clamp(22px,3vw,30px);letter-spacing:-.04em;margin:8px 0}.payment-panel p{color:var(--muted);margin:0}.payment-panel .btn{flex-shrink:0}.faq-list{border-top:1px solid var(--line);margin-top:28px}.faq-item{border-bottom:1px solid var(--line);padding:0 4px}.faq-item summary{cursor:pointer;list-style:none;position:relative;padding:22px 38px 22px 0;font-weight:700}.faq-item summary::-webkit-details-marker{display:none}.faq-item summary:after{content:'+';position:absolute;right:6px;top:17px;color:var(--lime);font-size:25px;font-weight:400}.faq-item[open] summary:after{content:'−'}.faq-item p{max-width:820px;color:var(--muted);margin:0;padding:0 38px 22px 0}.faq-item summary:focus-visible{outline:2px solid var(--lime);outline-offset:4px;border-radius:4px}
 @media(max-width:700px){.payment-panel{align-items:flex-start;flex-direction:column;gap:18px}.payment-panel .btn{width:100%;justify-content:center}.faq-item summary{padding:19px 34px 19px 0}.faq-item p{padding-right:0}}
+
+/* EXPERIENCIA INTERACTIVA: profundidad 3D y microinteracciones */
+:root{--pointer-x:50%;--pointer-y:30%}
+body{background-image:radial-gradient(700px circle at var(--pointer-x) var(--pointer-y),rgba(200,255,87,.055),transparent 55%)}
+.hero{isolation:isolate}
+.hero:after{content:'';position:absolute;z-index:-1;width:340px;height:340px;left:-180px;bottom:-210px;border:1px solid rgba(200,255,87,.12);border-radius:50%;box-shadow:0 0 0 35px rgba(200,255,87,.018),0 0 0 70px rgba(200,255,87,.014);pointer-events:none}
+.stage{transform-style:preserve-3d;will-change:transform;transition:transform .22s cubic-bezier(.2,.7,.2,1),box-shadow .3s;border-color:rgba(255,255,255,.16)}
+.stage:before,.stage:after{content:'';position:absolute;pointer-events:none;transform-style:preserve-3d;z-index:3}
+.stage:before{width:120px;height:120px;right:-28px;bottom:-36px;border:1px solid rgba(200,255,87,.55);border-radius:50%;transform:translateZ(55px) rotateX(68deg);box-shadow:0 0 35px rgba(200,255,87,.12),inset 0 0 25px rgba(200,255,87,.07);animation:orbitPulse 5s ease-in-out infinite}
+.stage:after{width:14px;height:14px;right:35px;bottom:24px;background:var(--lime);border-radius:50%;box-shadow:0 0 22px rgba(200,255,87,.8);transform:translateZ(85px);animation:floatOrb 4s ease-in-out infinite}
+.browser{transform:translateZ(24px);box-shadow:0 18px 50px rgba(0,0,0,.15);transition:transform .3s}.stage-top{transform:translateZ(38px)}
+.float{transform:translateZ(75px);animation:floatCard 5s ease-in-out infinite}.float-tag{transform:translateZ(65px);animation:floatCard 6s ease-in-out infinite reverse}
+.stage:focus-within,.stage:hover{box-shadow:0 38px 100px #0008,0 0 0 1px rgba(200,255,87,.08)}
+.project{transform-style:preserve-3d;will-change:transform;transition:transform .2s ease,border-color .25s,box-shadow .25s}.project:hover{box-shadow:0 25px 65px #0004;border-color:rgba(200,255,87,.48)}
+.btn{position:relative;overflow:hidden;isolation:isolate;transition:transform .2s cubic-bezier(.2,.8,.2,1),box-shadow .25s,background .2s}.btn:before{content:'';position:absolute;top:-60%;left:-120%;width:70%;height:220%;transform:rotate(22deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.42),transparent);transition:left .65s ease;z-index:-1}.btn:hover:before{left:150%}.btn:not(.ghost):hover{box-shadow:0 8px 32px rgba(200,255,87,.2)}
+@keyframes orbitPulse{0%,100%{opacity:.55;transform:translateZ(55px) rotateX(68deg) scale(.92)}50%{opacity:1;transform:translateZ(55px) rotateX(68deg) scale(1.06)}}
+@keyframes floatOrb{0%,100%{transform:translate3d(0,0,85px)}50%{transform:translate3d(-12px,-18px,85px)}}@keyframes floatCard{0%,100%{translate:0 0}50%{translate:0 -7px}}
+@media(max-width:850px){.stage:before{width:85px;height:85px;right:-14px;bottom:-25px}}
+@media(max-width:600px){body{background-image:none}.stage{transform:none!important;transition:none}.stage:before{width:65px;height:65px;right:-8px;bottom:-18px}.stage:after{width:10px;height:10px}.float,.float-tag{animation:none}.browser{transform:none}}
+@media(prefers-reduced-motion:reduce){.stage,.project,.browser,.float,.float-tag,.stage:before,.stage:after,.btn,.btn:before{animation:none!important;transition:none!important;transform:none!important}.stage:before,.stage:after{display:none}}
 </style>
 </head>
 <body>
@@ -160,5 +180,14 @@ let scrollTicking=false;
 function updateScrollProgress(){const max=document.documentElement.scrollHeight-window.innerHeight;const pct=max>0?(window.scrollY/max)*100:0;progress.style.width=pct+'%';scrollTicking=false}
 window.addEventListener('scroll',()=>{if(!scrollTicking){window.requestAnimationFrame(updateScrollProgress);scrollTicking=true}},{passive:true});
 updateScrollProgress();
+/* Iluminación reactiva y profundidad 3D, sin librerías externas */
+const finePointer=window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+if(finePointer&&!reduceMotion){
+ const stage=document.querySelector('.stage');let pointerFrame=0,lastX=0,lastY=0;
+ document.addEventListener('pointermove',event=>{lastX=event.clientX;lastY=event.clientY;if(pointerFrame)return;pointerFrame=requestAnimationFrame(()=>{document.documentElement.style.setProperty('--pointer-x',lastX+'px');document.documentElement.style.setProperty('--pointer-y',lastY+'px');pointerFrame=0})},{passive:true});
+ if(stage){stage.addEventListener('pointermove',event=>{const r=stage.getBoundingClientRect(),x=(event.clientX-r.left)/r.width,y=(event.clientY-r.top)/r.height;stage.style.transform='perspective(1100px) rotateX('+((.5-y)*10)+'deg) rotateY('+((x-.5)*13)+'deg) scale(1.015)'});stage.addEventListener('pointerleave',()=>{stage.style.transform='perspective(1100px) rotateX(0deg) rotateY(0deg) scale(1)'})}
+ document.querySelectorAll('.project').forEach(card=>{card.addEventListener('pointermove',event=>{const r=card.getBoundingClientRect(),x=(event.clientX-r.left)/r.width,y=(event.clientY-r.top)/r.height;card.style.transform='perspective(900px) rotateX('+((.5-y)*5)+'deg) rotateY('+((x-.5)*6)+'deg) translateY(-4px)'});card.addEventListener('pointerleave',()=>{card.style.transform=''})});
+ document.querySelectorAll('.btn').forEach(button=>{button.addEventListener('pointermove',event=>{const r=button.getBoundingClientRect(),x=event.clientX-r.left-r.width/2,y=event.clientY-r.top-r.height/2;button.style.transform='translate('+(x*.045)+'px,'+(y*.08-2)+'px)'});button.addEventListener('pointerleave',()=>{button.style.transform=''})});
+}
 </script>
 </body></html>
