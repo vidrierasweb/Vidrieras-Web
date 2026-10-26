@@ -318,12 +318,15 @@ if(finePointer&&!reduceMotion){
      const targetX=activePanel<0?base.x:(focused?0:(i<activePanel?-3.05:3.05));
      const targetZ=activePanel<0?base.z:(focused?2.1:-1.1);
      const targetScale=activePanel<0?base.scale:(focused?1.2:base.scale*.78);
-     p.position.x+=(targetX-p.position.x)*.075;
+     const finalX=activePanel<0?base.x:(focused?0:(i<activePanel?-3.15-(activePanel-i-1)*.3:3.15+(i-activePanel-1)*.3));
+     const targetRY=activePanel<0?base.ry+mx*.12:(focused?0:base.ry);
+     const targetRX=focused?-.025:base.rx;
+     p.position.x+=(finalX-p.position.x)*.075;
      p.position.z+=(targetZ-p.position.z)*.075;
      p.position.y+=(base.y+Math.sin(t*.65+i*1.4)*.055-p.position.y)*.06;
      p.scale.x+=(targetScale-p.scale.x)*.075;p.scale.y+=(targetScale-p.scale.y)*.075;p.scale.z+=(targetScale-p.scale.z)*.075;
-     p.rotation.y+=(activePanel<0?base.ry+mx*.12:(focused?0:base.ry)-p.rotation.y)*.07;
-     p.rotation.x+=(focused&&!other?-.025:base.rx-p.rotation.x)*.06;
+     p.rotation.y+=(targetRY-p.rotation.y)*.07;
+     p.rotation.x+=(targetRX-p.rotation.x)*.06;
     });
     ring.rotation.z=t*.055;ring2.rotation.z=-t*.038;points.rotation.y=t*.014;
    }
