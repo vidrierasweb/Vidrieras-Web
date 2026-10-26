@@ -130,6 +130,9 @@ body{background-image:radial-gradient(700px circle at var(--pointer-x) var(--poi
 @media(max-width:600px){.stage{min-height:420px;border-radius:22px}.immersive-scene{height:420px}.scene-hud{padding:20px}.scene-hint{font-size:8px;padding:8px}.scene-coordinate{display:none}}
 @media(prefers-reduced-motion:reduce){.stage:before,.scene-dot{animation:none!important}}
 
+
+/* Fallback de seguridad: el contenido debe seguir visible aunque falle JavaScript */
+.reveal{opacity:1;transform:none;filter:none;}
 </style>
 </head>
 <body>
