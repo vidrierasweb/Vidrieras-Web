@@ -113,7 +113,7 @@ body{background-image:radial-gradient(700px circle at var(--pointer-x) var(--poi
 .stage:after{content:"";position:absolute;inset:0;width:auto;height:auto;right:0;bottom:0;border-radius:inherit;background:linear-gradient(115deg,transparent 25%,#ffffff06 48%,transparent 68%);pointer-events:none;z-index:4}
 .stage .stage-top,.stage .browser,.stage .float,.stage .float-tag{display:none!important}
 .immersive-scene{position:relative;width:100%;height:540px;overflow:hidden;isolation:isolate;touch-action:pan-y}
-.immersive-scene canvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1}
+.immersive-scene canvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;cursor:grab;outline:none}.immersive-scene[data-hover-panel="true"] canvas{cursor:pointer}.scene-caption strong{display:block;margin-bottom:5px}.scene-hint{transition:opacity .2s}
 .scene-grid{position:absolute;inset:-20%;z-index:0;opacity:.28;background-image:linear-gradient(#c8ff5710 1px,transparent 1px),linear-gradient(90deg,#c8ff5710 1px,transparent 1px);background-size:38px 38px;transform:perspective(500px) rotateX(62deg) scale(1.4);transform-origin:50% 70%;mask-image:linear-gradient(transparent,#000 35%,#000 80%,transparent)}
 .scene-hud{position:absolute;z-index:3;inset:0;pointer-events:none;padding:23px;display:flex;flex-direction:column;justify-content:space-between}
 .scene-hud-top,.scene-hud-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -264,6 +264,37 @@ if(finePointer&&!reduceMotion){
    makePanel('Tu negocio merece más.','comercio online','#d7f3ad',.12,.15,.6,-.03,1.05),
    makePanel('Diseñado para crecer.','web a medida','#9bc7ff',2.18,-.05,-.05,-.24,.88)
   ];
+  // Cada escaparate es un objeto seleccionable: al hacer clic pasa al primer plano.
+  const basePanels=panels.map(p=>({x:p.position.x,y:p.position.y,z:p.position.z,rx:p.rotation.x,ry:p.rotation.y,rz:p.rotation.z,scale:p.scale.x}));
+  const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
+  let activePanel=-1,hoverPanel=-1;
+  panels.forEach((panel,index)=>panel.traverse(obj=>{obj.userData.panelIndex=index}));
+  function setPanelFromPointer(event){
+   const r=canvas.getBoundingClientRect();
+   pointer.x=((event.clientX-r.left)/r.width)*2-1;
+   pointer.y=-((event.clientY-r.top)/r.height)*2+1;
+   raycaster.setFromCamera(pointer,camera);
+   const hits=raycaster.intersectObjects(panels,true);
+   return hits.length?hits[0].object.userData.panelIndex:-1;
+  }
+  host.addEventListener('pointermove',event=>{
+   const next=setPanelFromPointer(event);
+   if(next!==hoverPanel){hoverPanel=next;canvas.style.cursor=next>=0?'pointer':'grab';host.dataset.hoverPanel=next>=0?'true':'false'}
+  },{passive:true});
+  host.addEventListener('click',event=>{
+   const next=setPanelFromPointer(event);
+   if(next<0)return;
+   activePanel=activePanel===next?-1:next;
+   const captions=[
+    ['Una marca. Una experiencia.','Diseño pensado para que tu marca se destaque.'],
+    ['Tu negocio merece más.','Una web clara, atractiva y preparada para tus clientes.'],
+    ['Diseñado para crecer.','Una presencia digital que acompaña tus próximos pasos.']
+   ];
+   const caption=host.querySelector('.scene-caption');
+   if(caption){caption.innerHTML='';const strong=document.createElement('strong');strong.textContent=activePanel<0?'Tu negocio, en otra dimensión':captions[activePanel][0];const copy=document.createTextNode(activePanel<0?'Diseñamos espacios digitales que hacen que tu marca se destaque.':captions[activePanel][1]);caption.append(strong,copy)}
+   const hint=host.querySelector('.scene-hint');
+   if(hint)hint.textContent=activePanel<0?'MOVÉ EL CURSOR ↗':'CLIC PARA VOLVER ↗';
+  });
   const ring=new THREE.Mesh(new THREE.TorusGeometry(3.35,.012,8,160),new THREE.MeshBasicMaterial({color:0xc8ff57,transparent:true,opacity:.4}));ring.rotation.set(1.08,.18,.3);ring.position.z=-.6;group.add(ring);
   const ring2=new THREE.Mesh(new THREE.TorusGeometry(2.9,.008,8,140),new THREE.MeshBasicMaterial({color:0x9bc7ff,transparent:true,opacity:.25}));ring2.rotation.set(.7,-.6,-.4);ring2.position.z=-.9;group.add(ring2);
   const particles=new THREE.BufferGeometry(),positions=[];for(let i=0;i<180;i++){positions.push((Math.random()-.5)*10,(Math.random()-.5)*7,(Math.random()-.5)*5-1)}
@@ -275,7 +306,29 @@ if(finePointer&&!reduceMotion){
   function resize(){const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.position.z=w<480?11.5:10.1;camera.updateProjectionMatrix()}
   const ro=new ResizeObserver(resize);ro.observe(host);resize();
   const clock=new THREE.Clock();
-  function render(){frame=requestAnimationFrame(render);const t=clock.getElapsedTime();if(!reduced){mx+=(tx-mx)*.035;my+=(ty-my)*.035;group.rotation.y=mx+Math.sin(t*.22)*.035;group.rotation.x=my+Math.sin(t*.3)*.018;panels.forEach((p,i)=>{p.position.y=[.05,.15,-.05][i]+Math.sin(t*.65+i*1.4)*.075;p.rotation.y=[.22,-.03,-.24][i]+mx*.16});ring.rotation.z=t*.07;ring2.rotation.z=-t*.045;points.rotation.y=t*.018}renderer.render(scene,camera)}
+  function render(){
+   const t=clock.getElapsedTime();
+   if(!reduced){
+    frame=requestAnimationFrame(render);
+    mx+=(tx-mx)*.045;my+=(ty-my)*.045;
+    group.rotation.y=mx+Math.sin(t*.22)*.025;
+    group.rotation.x=my+Math.sin(t*.3)*.014;
+    panels.forEach((p,i)=>{
+     const base=basePanels[i],focused=activePanel===i,other=activePanel>=0&&!focused;
+     const targetX=activePanel<0?base.x:(focused?0:(i<activePanel?-3.05:3.05));
+     const targetZ=activePanel<0?base.z:(focused?2.1:-1.1);
+     const targetScale=activePanel<0?base.scale:(focused?1.2:base.scale*.78);
+     p.position.x+=(targetX-p.position.x)*.075;
+     p.position.z+=(targetZ-p.position.z)*.075;
+     p.position.y+=(base.y+Math.sin(t*.65+i*1.4)*.055-p.position.y)*.06;
+     p.scale.x+=(targetScale-p.scale.x)*.075;p.scale.y+=(targetScale-p.scale.y)*.075;p.scale.z+=(targetScale-p.scale.z)*.075;
+     p.rotation.y+=(activePanel<0?base.ry+mx*.12:(focused?0:base.ry)-p.rotation.y)*.07;
+     p.rotation.x+=(focused&&!other?-.025:base.rx-p.rotation.x)*.06;
+    });
+    ring.rotation.z=t*.055;ring2.rotation.z=-t*.038;points.rotation.y=t*.014;
+   }
+   renderer.render(scene,camera);
+  }
   render();
   document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(frame)}else if(!reduced)render()});
  }catch(error){
