@@ -133,6 +133,9 @@ body{background-image:radial-gradient(700px circle at var(--pointer-x) var(--poi
 
 /* Fallback de seguridad: el contenido debe seguir visible aunque falle JavaScript */
 .reveal{opacity:1;transform:none;filter:none;}
+
+/* FIX DEFINITIVO: el contenido nunca debe quedar oculto esperando al observer JS */
+.reveal, .reveal.visible, body .reveal { opacity:1 !important; visibility:visible !important; transform:none !important; filter:none !important; }
 </style>
 </head>
 <body>
