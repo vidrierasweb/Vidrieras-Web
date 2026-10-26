@@ -135,6 +135,45 @@ body{background-image:radial-gradient(700px circle at var(--pointer-x) var(--poi
 
 /* FIX DEFINITIVO: el contenido nunca debe quedar oculto esperando al observer JS */
 .reveal, .reveal.visible, body .reveal { opacity:1 !important; visibility:visible !important; transform:none !important; filter:none !important; }
+
+/* HERO VISUAL — maqueta limpia, sin órbitas ni elementos flotantes extraños */
+.hero .stage{
+  transform:none!important;
+  transform-style:flat!important;
+  padding:18px!important;
+  border-radius:24px!important;
+  background:linear-gradient(145deg,#171a1d,#0c0e10)!important;
+  border:1px solid rgba(255,255,255,.13)!important;
+  box-shadow:0 28px 80px rgba(0,0,0,.32)!important;
+  overflow:hidden!important;
+}
+.hero .stage:before,.hero .stage:after{display:none!important;content:none!important}
+.hero .stage-top{display:flex!important;position:relative;transform:none!important;padding:3px 3px 16px!important;gap:10px;font-size:9px!important;letter-spacing:.09em}
+.hero .browser{
+  transform:none!important;
+  min-height:0!important;
+  border-radius:15px!important;
+  box-shadow:0 12px 35px rgba(0,0,0,.2)!important;
+  overflow:hidden!important;
+  background:#f4f3ed!important;
+}
+.hero .browser-nav{min-height:46px;padding:12px 15px!important;gap:10px;font-size:8px!important}
+.hero .browser-nav>span:nth-child(2){opacity:.58}
+.hero .browser-content{padding:clamp(22px,3vw,34px)!important}
+.hero .browser h2{font-size:clamp(29px,3.6vw,43px)!important;max-width:390px;line-height:.98!important}
+.hero .browser p{font-size:11px!important;max-width:280px!important}
+.hero .mini-cards{gap:9px!important;margin-top:28px!important}
+.hero .mini-cards div{height:76px!important;padding:12px!important;border:1px solid rgba(20,25,15,.06);font-size:8px!important;line-height:1.7}
+.hero .float,.hero .float-tag{display:none!important}
+@media(max-width:760px){
+ .hero .stage{padding:12px!important;border-radius:19px!important}
+ .hero .stage-top{font-size:8px!important;padding-bottom:12px!important}
+ .hero .browser-nav{padding:11px!important}
+ .hero .browser-nav>span:nth-child(2){display:none}
+ .hero .browser-content{padding:22px!important}
+ .hero .mini-cards div{height:65px!important;padding:9px!important}
+}
+
 </style>
 </head>
 <body>
