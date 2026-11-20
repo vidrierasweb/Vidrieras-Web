@@ -100,6 +100,8 @@ h1,h2{text-wrap:balance}
 .case .btn{margin-top:26px}
 .kicker{display:inline-block;background:var(--sign);color:var(--sign-ink);font-weight:700;font-size:14px;border-radius:99px;padding:6px 14px;margin-bottom:16px}
 
+.case.rev{grid-template-columns:.95fr 1.05fr}
+.case.rev img{box-shadow:-8px 8px 0 var(--sign)}
 /* Precios: etiquetas colgadas */
 #precios{background:var(--bg2);border-block:2px solid var(--edge)}
 .tags{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:64px;align-items:stretch}
@@ -195,6 +197,8 @@ footer{padding:34px 0 46px}
 
 /* Tablet y celular */
 @media(max-width:980px){
+  .case.rev{grid-template-columns:1fr}
+  .case.rev img{order:-1}
   .hero-grid,.case,.duo,.head{grid-template-columns:1fr}
   .head{gap:14px}
   .tags{grid-template-columns:1fr;gap:56px;max-width:520px;margin-inline:auto}
@@ -272,6 +276,17 @@ footer{padding:34px 0 46px}
       <h3>El resultado</h3><p>Más de 120 clientes ya pueden consultar productos, revisar información y preparar sus pedidos de una forma mucho más clara, cómoda y ordenada.</p>
       <a class="btn alt" href="https://distribuidoraroly.github.io/catalogo/" target="_blank" rel="noopener noreferrer">Ver el catálogo de Roly</a>
     </div>
+  </div>
+  <div class="case rev">
+    <div>
+      <span class="kicker">Otro negocio real</span>
+      <h2>Marara Distribuidora</h2>
+      <h3>El problema</h3><p>Marara vendía productos gastronómicos con listas de precios sueltas, sin fotos ni descripciones. Cada pedido se armaba a mano por WhatsApp.</p>
+      <h3>Lo que hice</h3><p>Armé su catálogo online: productos por categoría, buscador, fotos claras, precio y formato a la vista, ofertas destacadas y un carrito que manda el pedido listo por WhatsApp, con el total estimado.</p>
+      <h3>El resultado</h3><p>Más de 100 clientes ya pueden ver los productos, comparar formatos y armar su pedido de forma simple y ordenada.</p>
+      <a class="btn alt" href="https://marara-distribuidora.github.io/" target="_blank" rel="noopener noreferrer">Ver el catálogo de Marara</a>
+    </div>
+    <img src="demo-marara.jpg" width="760" height="330" alt="Catálogo online de Marara Distribuidora" loading="lazy">
   </div>
 </div></section>
 
